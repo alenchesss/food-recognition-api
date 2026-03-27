@@ -1,0 +1,84 @@
+import base64
+import binascii
+
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.core.exceptions import (
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_exception_handler,
+)
+from app.dependencies import get_recognizer
+from app.recognizer import IngredientRecognizer
+from app.schemas import (
+    HealthData,
+    HealthResponse,
+    IngredientItem,
+    IngredientRecognitionData,
+    IngredientRecognitionRequest,
+    IngredientRecognitionResponse,
+)
+
+
+app = FastAPI(title="ML Service")
+
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+
+image_types = {
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+}
+
+max_size = 10 * 1024 * 1024
+
+
+@app.get("/api/v1/health", response_model=HealthResponse)
+async def health() -> HealthResponse:
+    return HealthResponse(
+        data=HealthData(status="ok"),
+    )
+
+
+@app.post(
+    "/api/v1/ingredient-recognitions",
+    response_model=IngredientRecognitionResponse,
+)
+async def recognize(
+    request: IngredientRecognitionRequest,
+    recognizer: IngredientRecognizer = Depends(get_recognizer),
+) -> IngredientRecognitionResponse:
+    if request.content_type not in image_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported content_type",
+        )
+
+    try:
+        image_bytes = base64.b64decode(request.image, validate=True)
+    except binascii.Error as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid base64 image",
+        ) from exc
+
+    if len(image_bytes) > max_size:
+        raise HTTPException(
+            status_code=400,
+            detail="Image is too large",
+        )
+
+    predictions = recognizer.predict(
+        image_bytes=image_bytes,
+        content_type=request.content_type,
+    )
+
+    return IngredientRecognitionResponse(
+        data=IngredientRecognitionData(
+            ingredients=[IngredientItem(name=item.name) for item in predictions]
+        )
+    )
