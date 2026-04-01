@@ -4,7 +4,8 @@ from app.core.config import settings
 from app.core.http_client import get_http_client
 from app.schemas.models import RecognizeResponse
 from app.services.ml_client import recognize_ingredients
-from app.services.recipe_client import get_recipes_by_ingredients
+
+# from app.services.recipe_client import get_recipes_by_ingredients
 
 router = APIRouter(prefix="/api/v1", tags=["recognition"])
 
@@ -28,19 +29,23 @@ async def recognize(image: UploadFile = File(...)) -> RecognizeResponse:
 
     async with get_http_client() as client:
         # отправляем картинку в ml-service
+        print("=== http client created ===")
         try:
             ingredients = await recognize_ingredients(client, image_bytes, image.content_type)
         except Exception as e:
-            raise HTTPException(status_code=502, detail=f"Ошибка ml-service: {e}") from e
+            raise HTTPException(
+                status_code=502, detail=f"Ошибка ml-service: {type(e).__name__}: {e}"
+            ) from e
 
-        if not ingredients:
-            return RecognizeResponse(detected_ingredients=[], recipes=[])
+        # if not ingredients:
+        #     return RecognizeResponse(detected_ingredients=[], recipes=[])
 
         # отправляем ингредиенты в recipe-service
-        ingredient_names = [i.name for i in ingredients]
-        try:
-            recipes = await get_recipes_by_ingredients(client, ingredient_names)
-        except Exception as e:
-            raise HTTPException(status_code=502, detail=f"Ошибка recipe-service: {e}") from e
+        # ingredient_names = [i.name for i in ingredients]
+        # try:
+        #     recipes = await get_recipes_by_ingredients(client, ingredient_names)
+        # except Exception as e:
+        #     raise HTTPException(status_code=502, detail=f"Ошибка recipe-service: {e}") from e
 
-    return RecognizeResponse(detected_ingredients=ingredients, recipes=recipes)
+    # return RecognizeResponse(detected_ingredients=ingredients, recipes=recipes)
+    return RecognizeResponse(detected_ingredients=ingredients, recipes=[])

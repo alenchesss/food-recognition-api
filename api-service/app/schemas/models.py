@@ -3,11 +3,14 @@ from pydantic import BaseModel
 
 class Ingredient(BaseModel):
     name: str
-    confidence: float
+
+
+class MLServiceIngredientData(BaseModel):
+    ingredients: list[Ingredient]
 
 
 class MLServiceResponse(BaseModel):
-    ingredients: list[Ingredient]
+    data: MLServiceIngredientData
 
 
 class MissingIngredient(BaseModel):
