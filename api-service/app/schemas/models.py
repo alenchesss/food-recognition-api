@@ -34,3 +34,8 @@ class RecognizeResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     services: dict[str, str]
+
+
+class HealthData(BaseModel):
+    status: str
+    services: dict[str, str]
