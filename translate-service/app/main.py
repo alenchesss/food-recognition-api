@@ -1,0 +1,23 @@
+from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.core.exceptions import (
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_exception_handler,
+)
+from app.routers import health, translate
+
+app = FastAPI(
+    title="Translate Service",
+    description="Перевод рецептов с английского на русский через Groq",
+    version="0.1.0",
+)
+
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+
+app.include_router(health.router)
+app.include_router(translate.router)
