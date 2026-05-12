@@ -1,12 +1,12 @@
 from functools import lru_cache
 
-from app.config import Settings, load_settings
+from app.config import Settings, settings
 from app.recognizer import IngredientRecognizer
 
 
 @lru_cache
 def get_settings() -> Settings:
-    return load_settings()
+    return settings
 
 
 @lru_cache

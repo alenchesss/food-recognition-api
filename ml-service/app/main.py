@@ -1,10 +1,12 @@
 import base64
 import binascii
 
+import httpx
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.config import settings
 from app.core.exceptions import (
     http_exception_handler,
     unhandled_exception_handler,
@@ -20,7 +22,6 @@ from app.schemas import (
     IngredientRecognitionRequest,
     IngredientRecognitionResponse,
 )
-
 
 app = FastAPI(title="ML Service")
 
@@ -39,9 +40,20 @@ max_size = 10 * 1024 * 1024
 
 @app.get("/api/v1/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
-    return HealthResponse(
-        data=HealthData(status="ok"),
-    )
+    services: dict[str, str] = {}
+
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        try:
+            resp = await client.get(
+                f"{settings.groq_api_url}/models",
+                headers={"Authorization": f"Bearer {settings.groq_api_key}"},
+            )
+            services["groq"] = "ok" if resp.status_code == 200 else "degraded"
+        except Exception:
+            services["groq"] = "unavailable"
+
+    overall = "ok" if all(v == "ok" for v in services.values()) else "degraded"
+    return HealthResponse(data=HealthData(status=overall, services=services))
 
 
 @app.post(

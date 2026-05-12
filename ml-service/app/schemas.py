@@ -20,6 +20,7 @@ class IngredientRecognitionResponse(BaseModel):
 
 class HealthData(BaseModel):
     status: str
+    services: dict[str, str]
 
 
 class HealthResponse(BaseModel):

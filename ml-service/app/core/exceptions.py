@@ -6,25 +6,22 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.responses import error_response
 
-
 logger = logging.getLogger(__name__)
+
+_STATUS_TO_CODE = {
+    400: "BadRequestHttpException",
+    401: "UnauthorizedHttpException",
+    403: "ForbiddenHttpException",
+    404: "NotFoundHttpException",
+    500: "InternalServerError",
+}
 
 
 async def http_exception_handler(
     request: Request,
     exc: StarletteHTTPException,
 ):
-    if exc.status_code == 404:
-        error_code = "NotFoundHttpException"
-    elif exc.status_code == 400:
-        error_code = "BadRequestHttpException"
-    elif exc.status_code == 401:
-        error_code = "UnauthorizedHttpException"
-    elif exc.status_code == 403:
-        error_code = "ForbiddenHttpException"
-    else:
-        error_code = "HttpException"
-
+    error_code = _STATUS_TO_CODE.get(exc.status_code, "HttpException")
     return error_response(
         status_code=exc.status_code,
         code=error_code,
@@ -49,7 +46,6 @@ async def unhandled_exception_handler(
     exc: Exception,
 ):
     logger.exception("Unhandled internal error")
-
     return error_response(
         status_code=500,
         code="InternalServerError",
