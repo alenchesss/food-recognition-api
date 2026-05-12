@@ -3,11 +3,14 @@ from pydantic import BaseModel
 
 class Ingredient(BaseModel):
     name: str
-    confidence: float
+
+
+class MLServiceIngredientData(BaseModel):
+    ingredients: list[Ingredient]
 
 
 class MLServiceResponse(BaseModel):
-    ingredients: list[Ingredient]
+    data: MLServiceIngredientData
 
 
 class MissingIngredient(BaseModel):
@@ -29,5 +32,10 @@ class RecognizeResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
+    status: str
+    services: dict[str, str]
+
+
+class HealthData(BaseModel):
     status: str
     services: dict[str, str]

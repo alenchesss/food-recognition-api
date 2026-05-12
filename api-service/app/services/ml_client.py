@@ -14,12 +14,14 @@ async def recognize_ingredients(
     image_b64 = base64.b64encode(image_bytes).decode("utf-8")
 
     response = await client.post(
-        f"{settings.ml_service_url}/recognize",
+        f"{settings.ml_service_url}/api/v1/ingredient-recognitions",
         json={
             "image": image_b64,
             "content_type": content_type,
         },
     )
+    print(f"ML service status: {response.status_code}")
+    print(f"ML service response: {response.text}")
     response.raise_for_status()
     result = MLServiceResponse(**response.json())
-    return result.ingredients
+    return result.data.ingredients
