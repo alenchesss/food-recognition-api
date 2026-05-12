@@ -15,9 +15,10 @@ async def health() -> HealthResponse:
         for name, url in [
             ("ml-service", settings.ml_service_url),
             ("recipe-service", settings.recipe_service_url),
+            ("translate-service", settings.translate_service_url),
         ]:
             try:
-                resp = await client.get(f"{url}/health")
+                resp = await client.get(f"{url}/api/v1/health")
                 services[name] = "ok" if resp.status_code == 200 else "degraded"
             except Exception:
                 services[name] = "unavailable"

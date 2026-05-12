@@ -2,7 +2,7 @@ import base64
 import json
 from dataclasses import dataclass
 
-from openai import OpenAI
+import httpx
 
 from app.config import Settings
 
@@ -14,12 +14,8 @@ class RecognizedIngredient:
 
 class IngredientRecognizer:
     def __init__(self, settings: Settings) -> None:
-        self._client = OpenAI(
-            api_key=settings.yandex_api_key,
-            base_url=settings.yandex_base_url,
-            project=settings.yandex_project_id,
-        )
-        self._prompt_id = settings.yandex_prompt_id
+        self._api_key = settings.groq_api_key
+        self._api_url = settings.groq_api_url
 
     def predict(
         self,
@@ -27,37 +23,48 @@ class IngredientRecognizer:
         image_bytes: bytes,
         content_type: str,
     ) -> list[RecognizedIngredient]:
-        image_base64 = self._encode_image(image_bytes)
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
-        response = self._client.responses.create(
-            prompt={"id": self._prompt_id},
-            input=[
-                {
-                    "role": "user",
-                    "content": [
+        with httpx.Client(timeout=60.0) as client:
+            response = client.post(
+                f"{self._api_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self._api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                    "messages": [
                         {
-                            "type": "input_text",
-                            "text": (
-                                "Определи продукты на изображении. "
-                                "Верни строго JSON-объект формата "
-                                '{"ingredients":[{"name":"bread"},{"name":"cheese"}]}. '
-                                "Без markdown, без пояснений, без лишнего текста."
-                            ),
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": f"data:{content_type};base64,{image_base64}",
-                        },
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": (
+                                        "Identify all food products and ingredients "  # noqa: E501
+                                        "visible in this image. "  # noqa: E501
+                                        "Return strictly a JSON object in format: "  # noqa: E501
+                                        '{"ingredients":[{"name":"bread"},{"name":"cheese"}]}. '  # noqa: E501
+                                        "No markdown, no explanations, no extra text."  # noqa: E501
+                                    ),
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:{content_type};base64,{image_base64}",
+                                    },
+                                },
+                            ],
+                        }
                     ],
-                }
-            ],
-        )
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.1,
+                },
+            )
+            response.raise_for_status()
 
-        return self._parse_response(response.output_text)
-
-    @staticmethod
-    def _encode_image(image_bytes: bytes) -> str:
-        return base64.b64encode(image_bytes).decode("utf-8")
+        raw_text = response.json()["choices"][0]["message"]["content"]
+        return self._parse_response(raw_text)
 
     @staticmethod
     def _parse_response(raw_text: str) -> list[RecognizedIngredient]:

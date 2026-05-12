@@ -16,7 +16,7 @@ class InstructionStep(BaseModel):
 class Recipe(BaseModel):
     id: int
     title: str
-    image: str
+    image: str | None = None
     used_ingredients_count: int
     missing_ingredients: list[MissingIngredient]
     instructions: list[InstructionStep]

@@ -12,15 +12,22 @@ class MLServiceResponse(BaseModel):
 
 class MissingIngredient(BaseModel):
     name: str
+    amount: float
+    unit: str
+
+
+class InstructionStep(BaseModel):
+    number: int
+    description: str
 
 
 class Recipe(BaseModel):
     id: int
-    name: str
-    description: str
-    ingredients: list[str]
+    title: str
+    image: str | None
+    used_ingredients_count: int
     missing_ingredients: list[MissingIngredient]
-    instructions: str
+    instructions: list[InstructionStep]
 
 
 class RecognizeResponse(BaseModel):
