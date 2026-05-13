@@ -2,13 +2,13 @@ import httpx
 from fastapi import APIRouter
 
 from app.core.config import settings
-from app.schemas.models import HealthResponse
+from app.schemas.models import HealthData
 
-router = APIRouter(tags=["health"])
+router = APIRouter(prefix="/api/v1", tags=["health"])
 
 
 @router.get("/health")
-async def health() -> HealthResponse:
+async def health() -> dict:
     services: dict[str, str] = {}
 
     async with httpx.AsyncClient(timeout=5.0) as client:
@@ -24,4 +24,4 @@ async def health() -> HealthResponse:
                 services[name] = "unavailable"
 
     overall = "ok" if all(v == "ok" for v in services.values()) else "degraded"
-    return HealthResponse(status=overall, services=services)
+    return {"data": HealthData(status=overall, services=services).model_dump()}

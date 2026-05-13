@@ -23,6 +23,7 @@ class FakePrediction:
 
 
 class FakeRecognizer:
+
     def __init__(self, ingredients: list[str] | None = None) -> None:
         self.ingredients = ingredients or []
         self.calls: list[tuple[bytes, str]] = []

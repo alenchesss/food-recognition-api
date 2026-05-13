@@ -30,6 +30,7 @@ async def recognize(image: UploadFile = File(...)) -> RecognizeResponse:
 
     async with get_http_client() as client:
         # отправляем картинку в ml-service
+        print("=== http client created ===")
         try:
             ingredients = await recognize_ingredients(client, image_bytes, image.content_type)
         except Exception as e:
@@ -37,8 +38,8 @@ async def recognize(image: UploadFile = File(...)) -> RecognizeResponse:
             print(f"EXCEPTION: {e}")
             raise HTTPException(status_code=502, detail=f"Ошибка ml-service: {e}") from e
 
-        if not ingredients:
-            return RecognizeResponse(detected_ingredients=[], recipes=[])
+        # if not ingredients:
+        #     return RecognizeResponse(detected_ingredients=[], recipes=[])
 
         # отправляем ингредиенты в recipe-service
         try:
