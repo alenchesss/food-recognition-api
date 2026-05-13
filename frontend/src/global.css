@@ -1,0 +1,84 @@
+:root {
+  --c-bg: #2a3450;
+  --c-bg-deep: #1f2840;
+  --c-surface: #4a3f4a;
+  --c-surface-2: #6e5f62;
+  --c-accent: #956b70;
+  --c-accent-warm: #b79783;
+  --c-text: #f4ebe1;
+  --c-text-muted: rgba(244, 235, 225, 0.65);
+  --c-text-dim: rgba(244, 235, 225, 0.4);
+
+  --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --shadow-card: 0 20px 60px -20px rgba(0, 0, 0, 0.45),
+    0 8px 24px -8px rgba(0, 0, 0, 0.25);
+  --shadow-soft: 0 4px 20px -4px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top, #3a4668 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(149, 107, 112, 0.25) 0%, transparent 55%),
+    var(--c-bg);
+  background-attachment: fixed;  /* ← добавить */
+  background-size: cover;        /* ← добавить */
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--c-accent);
+  color: var(--c-text);
+}
+
+/* скроллбар */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--c-bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--c-surface);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-surface-2);
+}
