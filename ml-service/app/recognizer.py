@@ -41,9 +41,11 @@ class IngredientRecognizer:
                                 {
                                     "type": "text",
                                     "text": (
-                                        "Identify all food products and ingredients visible in this image. "
-                                        'Return strictly a JSON object in format: {"ingredients":[{"name":"bread"},{"name":"cheese"}]}. '
-                                        "No markdown, no explanations, no extra text."
+                                        "Identify all food products and ingredients "  # noqa: E501
+                                        "visible in this image. "  # noqa: E501
+                                        "Return strictly a JSON object in format: "  # noqa: E501
+                                        '{"ingredients":[{"name":"bread"},{"name":"cheese"}]}. '  # noqa: E501
+                                        "No markdown, no explanations, no extra text."  # noqa: E501
                                     ),
                                 },
                                 {

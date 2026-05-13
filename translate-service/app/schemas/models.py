@@ -1,18 +1,7 @@
 from pydantic import BaseModel
 
 
-class Ingredient(BaseModel):
-    name: str
-
-
-class MLServiceIngredientData(BaseModel):
-    ingredients: list[Ingredient]
-
-
-class MLServiceResponse(BaseModel):
-    data: MLServiceIngredientData
-
-
+# входящий рецепт
 class MissingIngredient(BaseModel):
     name: str
     amount: float
@@ -27,22 +16,27 @@ class InstructionStep(BaseModel):
 class Recipe(BaseModel):
     id: int
     title: str
-    image: str | None
+    image: str | None = None
     used_ingredients_count: int
     missing_ingredients: list[MissingIngredient]
     instructions: list[InstructionStep]
 
 
-class RecognizeResponse(BaseModel):
-    detected_ingredients: list[Ingredient]
+# запрос
+class TranslateRecipesRequest(BaseModel):
     recipes: list[Recipe]
 
 
-class HealthResponse(BaseModel):
-    status: str
-    services: dict[str, str]
+# ответ
+class TranslateRecipesData(BaseModel):
+    recipes: list[Recipe]
 
 
+class TranslateRecipesResponse(BaseModel):
+    data: TranslateRecipesData
+
+
+# health
 class HealthData(BaseModel):
     status: str
     services: dict[str, str]

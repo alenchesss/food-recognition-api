@@ -10,5 +10,5 @@ RECIPE_SERVICE_URL = settings.recipe_service_url
 
 @asynccontextmanager
 async def get_http_client():
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         yield client

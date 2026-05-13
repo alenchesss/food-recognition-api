@@ -2,9 +2,9 @@
 conftest для ml-service.
 
 """
+
 import os
 from dataclasses import dataclass
-
 
 os.environ.setdefault("YANDEX_API_KEY", "test-key")
 os.environ.setdefault("YANDEX_PROJECT_ID", "test-project")

@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     spoonacular_api_key: str
     spoonacular_base_url: str = "https://api.spoonacular.com"
 
-    database_url: str
+    database_url: str | None = None
 
     class Config:
         env_file = ".env"

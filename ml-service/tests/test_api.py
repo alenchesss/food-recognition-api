@@ -2,6 +2,7 @@
 Тесты HTTP-эндпоинтов ml-service.
 
 """
+
 import base64
 
 import pytest
@@ -26,9 +27,7 @@ def test_recognize_success(client, fake_recognizer):
     assert response.status_code == 200
     body = response.json()
     assert "data" in body
-    assert body["data"] == {
-        "ingredients": [{"name": "tomato"}, {"name": "cheese"}]
-    }
+    assert body["data"] == {"ingredients": [{"name": "tomato"}, {"name": "cheese"}]}
     # recognizer был вызван с теми же байтами и content_type
     assert len(fake_recognizer.calls) == 1
     assert fake_recognizer.calls[0] == (image_bytes, "image/jpeg")

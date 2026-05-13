@@ -64,6 +64,7 @@ async def recognize(
     request: IngredientRecognitionRequest,
     recognizer: IngredientRecognizer = Depends(get_recognizer),
 ) -> IngredientRecognitionResponse:
+    print(f"GOT ML REQUEST, content_type: {request.content_type}, image size: {len(request.image)}")
     if request.content_type not in image_types:
         raise HTTPException(
             status_code=400,
@@ -83,11 +84,15 @@ async def recognize(
             status_code=400,
             detail="Image is too large",
         )
-
-    predictions = recognizer.predict(
-        image_bytes=image_bytes,
-        content_type=request.content_type,
-    )
+    try:
+        predictions = recognizer.predict(
+            image_bytes=image_bytes,
+            content_type=request.content_type,
+        )
+    except Exception as exc:
+        print(f"PREDICT FAILED: {type(exc).__name__}: {exc}", flush=True)
+        raise
+    print(f"PREDICT OK, count={len(predictions)}", flush=True)
 
     return IngredientRecognitionResponse(
         data=IngredientRecognitionData(
