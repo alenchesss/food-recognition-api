@@ -1,0 +1,59 @@
+services:
+  api-service:
+    build:
+      context: ./api-service
+    container_name: api-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ml-service
+      - recipe-service
+      - translate-service
+    volumes:
+      - ./api-service/.env:/app/.env:ro
+    networks:
+      - food-recognition-network
+
+  ml-service:
+    build:
+      context: ./ml-service
+    container_name: ml-service
+    volumes:
+      - ./ml-service/.env:/app/.env:ro
+    networks:
+      - food-recognition-network
+
+  recipe-service:
+    build:
+      context: ./recipe-service
+    container_name: recipe-service
+    volumes:
+      - ./recipe-service/.env:/app/.env:ro
+    networks:
+      - food-recognition-network
+
+  translate-service:
+    build:
+      context: ./translate-service
+    container_name: translate-service
+    volumes:
+      - ./translate-service/.env:/app/.env:ro
+    networks:
+      - food-recognition-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api-service
+    volumes:
+      - ./frontend/.env:/app/.env:ro
+    networks:
+      - food-recognition-network
+
+networks:
+  food-recognition-network:
+    driver: bridge
