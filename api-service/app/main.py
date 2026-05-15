@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import health, recognize
-
+ 
 app = FastAPI(
     title="Food Recognition API",
     description="Загрузи фото еды — получи ингредиенты и рецепты.",
@@ -23,3 +23,5 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(recognize.router)
+ 
+ 

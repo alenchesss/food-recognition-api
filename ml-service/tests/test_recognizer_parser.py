@@ -2,7 +2,6 @@
 Тесты парсера ответа Yandex GPT в IngredientRecognizer._parse_response.
 
 """
-
 import pytest
 
 from app.recognizer import IngredientRecognizer, RecognizedIngredient
