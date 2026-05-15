@@ -1,6 +1,6 @@
 import { getMockResponse } from './mock.js'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_BASE || ''
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export async function recognizeFood(file) {
